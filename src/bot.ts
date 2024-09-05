@@ -1,8 +1,7 @@
-import {Bot, InputFile, webhookCallback} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
+import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
-import { Application } from "https://deno.land/x/oak@v16.1.0/mod.ts";
+import { serve } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { getRandomFile } from './Capoo.ts';
-
 
 
 
@@ -10,10 +9,11 @@ import { getRandomFile } from './Capoo.ts';
 
 const bot = new Bot("7490814974:AAFERdZu-8CmQNmLMSagieAnbvuXgJ47AyA"); // <-- 把你的 bot token 放在 "" 之间
 
+
 bot.api.config.use(autoRetry());
 
 
-{
+//start命令
     bot.command("start", async (ctx) =>
         await ctx.reply("你好\n" +
         "现在实现的功能：\n" +
@@ -23,8 +23,8 @@ bot.api.config.use(autoRetry());
                 // `reply_parameters` 指定实际的回复哪一条信息。
                 reply_parameters: { message_id: ctx.msg.message_id },
             }));
-}
 
+//随机获取Capoo图片
 bot.command("capoo", async (ctx) => {
     try {
         const randomFilePath = await getRandomFile(); // 等待异步调用
@@ -41,7 +41,7 @@ bot.command("capoo", async (ctx) => {
 });
 
 
-
+//大饼
 bot.command("todo", async (ctx) => {
     const messageText =
         "//TODO 给bot搞个头像\n" +
@@ -54,7 +54,7 @@ bot.command("todo", async (ctx) => {
 });
 
 
-
+//捕捉错误信息 防止报错退出
 bot.catch((err) => {
     console.error('Error occurred:', err);
     err.ctx.reply(`An error occurred: ${err.message}`).then(() => {
@@ -66,7 +66,22 @@ bot.catch((err) => {
     });
 });
 
-const app = new Application();
 
-app.use(webhookCallback(bot, "oak"))
-// bot.start();
+
+// 使用 webhook 模式
+serve(async (req) => {
+    if (req.method === "POST") {
+        const update = await req.json();
+        await bot.handleUpdate(update); // 处理更新
+        return new Response("OK", { status: 200 });
+    }
+    return new Response("Not Found", { status: 404 });
+});
+
+// 设置 webhook
+const WEBHOOK_URL = "https://<YOUR_DENO_DEPLOY_URL>";
+await bot.api.setWebhook(WEBHOOK_URL);
+
+
+
+// bot.start(); //长轮询启动bot
