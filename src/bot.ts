@@ -32,9 +32,10 @@ bot.command("capoo", async (ctx) => {
             // `reply_parameters` 指定实际的回复哪一条信息。
             reply_parameters: { message_id: ctx.msg.message_id },
         });
-    } catch (_error) {
+    } catch (error) {
         // console.error('获取随机文件时出错:', error);
-        await ctx.reply(`咖波死了呜呜呜呜\n`); // 错误处理
+        await ctx.reply(`咖波死了呜呜呜呜\n
+        死因：${error.message}\n`); // 错误处理
     }
 });
 
@@ -55,10 +56,14 @@ bot.command("todo", async (ctx) => {
 
 bot.catch((err) => {
     console.error('Error occurred:', err);
-    // const error = err.message
-    // 你可以选择向管理员发送错误信息
-    // ctx.api.sendMessage(YOUR_CHAT_ID, `An error occurred: ${err.message}`);
+    err.ctx.reply(`An error occurred: ${err.message}`).then(() => {
+        // 这里可以继续处理回复成功后的逻辑
+        console.log('Error message sent successfully.');
+    }).catch(err => {
+        // 处理发送消息时可能发生的错误
+        console.error('Failed to send error message:', err);
+    });
 });
 
 
-bot.start();
+// bot.start();
