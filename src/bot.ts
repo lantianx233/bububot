@@ -2,16 +2,14 @@ import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
 import { getRandomFile } from './getCapoo.ts';
 
-// export const bot = new Bot("7490814974:AAFERdZu-8CmQNmLMSagieAnbvuXgJ47AyA"); // <-- 把你的 bot token 放在 "" 之间
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 bot.api.config.use(autoRetry());
 
 //start命令
     bot.command("start", async (ctx) =>
-        await ctx.reply("你好\n" +
-        "现在实现的功能：\n" +
-        "1.输入/capoo随机获取咖波，就一行代码（\n" +
-        "2.输入/todo查看主包画的大饼\n",
+        await ctx.reply("放到github上了\n" +
+            "https://github.com/lantianx233/bububot\n" +
+            "欢迎搞破坏🐳\n",
             {
                 // `reply_parameters` 指定实际的回复哪一条信息。
                 reply_parameters: { message_id: ctx.msg.message_id },
@@ -20,7 +18,7 @@ bot.api.config.use(autoRetry());
 //随机获取Capoo图片
 bot.command("capoo", async (ctx) => {
     try {
-        const randomFilePath = await getRandomFile(); // 等待异步调用
+        const randomFilePath = await getRandomFile();
 
         await ctx.replyWithAnimation(new InputFile(randomFilePath), {
             reply_parameters: { message_id: ctx.msg.message_id },
@@ -31,21 +29,10 @@ bot.command("capoo", async (ctx) => {
         死因：${error.message}\n`,
             {
             reply_parameters: { message_id: ctx.msg.message_id },
-        }); // 错误处理
+        });
     }
 });
 
-//大饼
-bot.command("todo", async (ctx) => {
-    const messageText =
-        "//TODO 给bot搞个头像\n" +
-        "(已完成) 搞个服务器部署\n" +
-        "大饼制作中...\n";
-    await ctx.reply(messageText,{
-        // `reply_parameters` 指定实际的回复哪一条信息。
-        reply_parameters: { message_id: ctx.msg.message_id },
-    })
-});
 
 //捕捉错误信息 防止报错退出
 bot.catch((err) => {
