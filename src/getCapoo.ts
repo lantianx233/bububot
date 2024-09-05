@@ -5,7 +5,7 @@ import { join, extname } from 'https://deno.land/std@0.181.0/path/mod.ts';
 const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.mov', '.avi'];
 
 // 定义文件夹路径
-const folderPath = '../Capoo';  // 请将 'your-folder-path' 替换为您的主文件夹路径
+const folderPath = `${Deno.cwd()}/Capoo`;
 
 // 递归函数，用于获取文件夹中的所有媒体文件
 export async function getMediaFiles(dir: string): Promise<string[]> {
