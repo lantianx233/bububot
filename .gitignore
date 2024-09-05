@@ -166,3 +166,4 @@ package*
 *.js
 *.json
 #Capoo/
+.DS_Store
