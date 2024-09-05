@@ -1,6 +1,6 @@
 import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
-import { serve } from "https://deno.land/x/oak@v16.1.0/mod.ts";
+// import { serve } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { getRandomFile } from './Capoo.ts';
 
 
@@ -69,18 +69,14 @@ bot.catch((err) => {
 
 
 // 使用 webhook 模式
-serve(async (req) => {
-    if (req.method === "POST") {
-        const update = await req.json();
-        await bot.handleUpdate(update); // 处理更新
-        return new Response("OK", { status: 200 });
-    }
-    return new Response("Not Found", { status: 404 });
-});
-
-// 设置 webhook
-const WEBHOOK_URL = "https://bububot.deno.dev/";
-await bot.api.setWebhook(WEBHOOK_URL);
+// serve(async (req) => {
+//     if (req.method === "POST") {
+//         const update = await req.json();
+//         bot.handleUpdate(update); // 处理更新
+//         return new Response("OK", { status: 200 });
+//     }
+//     return new Response("Not Found", { status: 404 });
+// });
 
 
 
