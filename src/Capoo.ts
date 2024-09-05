@@ -42,6 +42,6 @@ export async function getRandomFile(): Promise<string> {
     }
 
     // 随机选择一个文件
-    const randomFile = mediaFiles[Math.floor(Math.random() * mediaFiles.length)];
-    return randomFile; // 返回完整路径
+    // const randomFile = mediaFiles[Math.floor(Math.random() * mediaFiles.length)];
+    return mediaFiles[Math.floor(Math.random() * mediaFiles.length)]; // 返回完整路径
 }
