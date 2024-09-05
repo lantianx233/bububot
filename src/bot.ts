@@ -1,5 +1,6 @@
-import { Bot , InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
+import {Bot, InputFile, webhookCallback} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
+import { Application } from "https://deno.land/x/oak@v16.1.0/mod.ts";
 import { getRandomFile } from './Capoo.ts';
 
 
@@ -65,5 +66,7 @@ bot.catch((err) => {
     });
 });
 
+const app = new Application();
 
+app.use(webhookCallback(bot, "oak"))
 // bot.start();
