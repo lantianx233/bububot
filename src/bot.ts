@@ -79,8 +79,8 @@ serve(async (req) => {
 });
 
 // 设置 webhook
-const WEBHOOK_URL = "https://<YOUR_DENO_DEPLOY_URL>";
-await bot.api.setWebhook(WEBHOOK_URL);
+// const WEBHOOK_URL = "https://<YOUR_DENO_DEPLOY_URL>";
+// await bot.api.setWebhook(WEBHOOK_URL);
 
 
 
