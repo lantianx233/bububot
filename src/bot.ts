@@ -56,9 +56,13 @@ bot.command("todo", async (ctx) => {
 
 bot.catch((err) => {
     console.error('Error occurred:', err);
-    // const error = err.message
-    // 你可以选择向管理员发送错误信息
-    // ctx.api.sendMessage(YOUR_CHAT_ID, `An error occurred: ${err.message}`);
+    err.ctx.reply(`An error occurred: ${err.message}`).then(() => {
+        // 这里可以继续处理回复成功后的逻辑
+        console.log('Error message sent successfully.');
+    }).catch(err => {
+        // 处理发送消息时可能发生的错误
+        console.error('Failed to send error message:', err);
+    });
 });
 
 
