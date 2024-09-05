@@ -1,5 +1,6 @@
 import { Bot , InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
+import { run } from "https://deno.land/x/grammy_runner@v2.0.3/mod.ts";
 import { getRandomFile } from './Capoo.ts';
 
 
@@ -61,4 +62,5 @@ bot.catch((err) => {
 });
 
 
-bot.start();
+// bot.start();
+run(bot);
