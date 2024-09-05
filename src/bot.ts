@@ -1,22 +1,11 @@
-import {Bot, InputFile, webhookCallback} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
+import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
 import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
-import { Application } from "https://deno.land/x/oak@v16.1.0/mod.ts";
-import { getRandomFile } from './Capoo.ts';
+import { getRandomFile } from './getCapoo.ts';
 
-
-
-
-
-const bot = new Bot("7490814974:AAFERdZu-8CmQNmLMSagieAnbvuXgJ47AyA",{
-    client: {
-        // 如果你愿意在某些方法上使用 webhook reply。
-        canUseWebhookReply: (method) => method === "sendChatAction",
-    },
-}); // <-- 把你的 bot token 放在 "" 之间
-
+// export const bot = new Bot("7490814974:AAFERdZu-8CmQNmLMSagieAnbvuXgJ47AyA"); // <-- 把你的 bot token 放在 "" 之间
+export const bot = new Bot(Deno.env.get("7490814974:AAFERdZu-8CmQNmLMSagieAnbvuXgJ47AyA") || "");
 
 bot.api.config.use(autoRetry());
-
 
 //start命令
     bot.command("start", async (ctx) =>
@@ -45,7 +34,6 @@ bot.command("capoo", async (ctx) => {
     }
 });
 
-
 //大饼
 bot.command("todo", async (ctx) => {
     const messageText =
@@ -58,7 +46,6 @@ bot.command("todo", async (ctx) => {
     })
 });
 
-
 //捕捉错误信息 防止报错退出
 bot.catch((err) => {
     console.error('Error occurred:', err);
@@ -70,23 +57,3 @@ bot.catch((err) => {
         console.error('Failed to send error message:', err);
     });
 });
-
-
-const app = new Application();
-app.use(webhookCallback(bot, "oak"));
-
-
-
-// 使用 webhook 模式
-// serve(async (req) => {
-//     if (req.method === "POST") {
-//         const update = await req.json();
-//         bot.handleUpdate(update); // 处理更新
-//         return new Response("OK", { status: 200 });
-//     }
-//     return new Response("Not Found", { status: 404 });
-// });
-
-
-
-// bot.start(); //长轮询启动bot
