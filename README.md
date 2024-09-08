@@ -6,9 +6,8 @@
 ## 现在实现的功能：
 1. 输入/capoo随机获取咖波
 
+### [加入TODOlist](https://to-do.microsoft.com/sharing?InvitationToken=3cu6dIoRkUJWuLdEWDRqFQDyLmKPJaro7B1zO7q5DPdwNCfAsn5Trm7v4RWzRmyN8)
 
 
-## TODO
 
-- ✔ 搞个服务器部署
-- ✔ 给bot搞个头像
+
