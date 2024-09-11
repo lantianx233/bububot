@@ -1,21 +1,26 @@
-import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
-import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
-import { getRandomFile } from './getCapoo.ts';
-
+import { autoRetry, Bot, Context, getRandomFile, InputFile } from "./deps.ts";
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
+
 bot.api.config.use(autoRetry());
 
-//start命令
-    bot.command("start", async (ctx) =>
-        await ctx.reply("放到github上了\n" +
-            "https://github.com/lantianx233/bububot\n" +
-            "欢迎搞破坏🐳\n",
-            {
-                // `reply_parameters` 指定实际的回复哪一条信息。
-                reply_parameters: { message_id: ctx.msg.message_id },
-            }));
+bot.command("start", async (ctx) => {
+    await ctx.reply("🐳", {
+        reply_parameters: { message_id: ctx.msg.message_id },
+    });
+    await ctx.reply(
+        '<a href="https://github.com/lantianx233/bububot">Github页面</a>',
+        {
+            reply_parameters: { message_id: ctx.msg.message_id },
+            parse_mode: "HTML",
+        },
+    );
+});
 
-//随机获取Capoo图片
+/**
+ * /capoo
+ * 通过 getRandomFile()随机获取文件名
+ * 发送对应图片
+ */
 bot.command("capoo", async (ctx) => {
     try {
         const randomFilePath = await getRandomFile();
@@ -24,24 +29,91 @@ bot.command("capoo", async (ctx) => {
             reply_parameters: { message_id: ctx.msg.message_id },
         });
     } catch (error) {
-        // console.error('获取随机文件时出错:', error);
-        await ctx.reply(`咖波死了呜呜呜呜\n
-        死因：${error.message}\n`,
+        await ctx.reply(
+            `错误：${error.message}\n`,
             {
-            reply_parameters: { message_id: ctx.msg.message_id },
-        });
+                reply_parameters: { message_id: ctx.msg.message_id },
+            },
+        );
     }
 });
 
+/**
+ *  通过/push 将信息、图片、文件发送给某个用户或群组（频道）
+ *  回复某个要发送的信息
+ *  输入 /push [chatId] 以发送
+ */
+bot.command("push", async (ctx: Context) => {
+    const args = ctx.message?.text?.split(" ").slice(1);
+    if (!args || args.length < 1) {
+        await ctx.reply("请提供目标 chat_id，例如 /push [id]");
+        return;
+    }
 
-//捕捉错误信息 防止报错退出
-bot.catch((err) => {
-    console.error('Error occurred:', err);
-    err.ctx.reply(`An error occurred: ${err.message}`).then(() => {
-        // 这里可以继续处理回复成功后的逻辑
-        console.log('Error message sent successfully.');
-    }).catch(err => {
-        // 处理发送消息时可能发生的错误
-        console.error('Failed to send error message:', err);
-    });
+    const targetChatId = args[0];
+    const replyMessage = ctx.message?.reply_to_message;
+
+    if (!replyMessage) {
+        await ctx.reply("请回复要推送的消息或文件。");
+        return;
+    }
+
+    try {
+        if (replyMessage.text) {
+            // 发送文本消息
+            await bot.api.sendMessage(targetChatId, replyMessage.text);
+        } else if (replyMessage.photo) {
+            // 发送图片
+            const photoFileId =
+                replyMessage.photo[replyMessage.photo.length - 1].file_id;
+            await bot.api.sendPhoto(targetChatId, photoFileId);
+        } else if (replyMessage.document) {
+            // 发送文件
+            const documentFileId = replyMessage.document.file_id;
+            await bot.api.sendDocument(targetChatId, documentFileId);
+        } else {
+            await ctx.reply("回复的消息类型无法处理。");
+            return;
+        }
+
+        await ctx.reply("信息已成功推送！", {
+            reply_parameters: { message_id: ctx.msg?.message_id as number },
+        });
+    } catch (error) {
+        await ctx.reply(
+            `错误：${error.message}\n`,
+            {
+                reply_parameters: { message_id: ctx.msg?.message_id as number },
+            },
+        );
+    }
+});
+
+/**
+ * 获取当前chatId
+ */
+bot.command("id", async (ctx) => {
+    try {
+        await ctx.reply(ctx.chat.id.toString());
+    } catch (error) {
+        await ctx.reply(
+            `错误：${error.message}\n`,
+            {
+                reply_parameters: { message_id: ctx.msg.message_id },
+            },
+        );
+    }
+});
+
+/**
+ * 乱写catch为了不报错退出
+ */
+bot.catch(async (err) => {
+    const ctx = err.ctx;
+    await ctx.reply(
+        `${err.message}`,
+        {
+            reply_parameters: { message_id: ctx.msg?.message_id as number },
+        },
+    );
 });

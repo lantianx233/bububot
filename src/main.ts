@@ -1,6 +1,6 @@
-import { webhookCallback } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
-// 你可以将其修改为正确的方式来导入你的 `Bot` 对象。
-import {bot} from "./bot.ts";
+import { webhookCallback } from "./deps.ts";
+
+import { bot } from "./bot.ts";
 
 const handleUpdate = webhookCallback(bot, "std/http");
 
