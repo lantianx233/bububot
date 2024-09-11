@@ -16,7 +16,6 @@ bot.catch(async (err) => {
     );
 });
 
-
 bot.command("start", async (ctx) => {
     await ctx.reply("🐳", {
         reply_parameters: { message_id: ctx.msg.message_id },
@@ -37,11 +36,25 @@ bot.command("start", async (ctx) => {
  */
 bot.command("capoo", async (ctx) => {
     try {
-        const randomFilePath = await getRandomFile();
+        const { filePath, fileType } = await getRandomFile();
 
-        await ctx.replyWithAnimation(new InputFile(randomFilePath), {
-            reply_parameters: { message_id: ctx.msg.message_id },
-        });
+        if (fileType === ".gif") {
+            await ctx.replyWithAnimation(new InputFile(filePath), {
+                reply_parameters: { message_id: ctx.msg.message_id },
+            });
+        } else if (
+            fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png"
+        ) {
+            await ctx.replyWithPhoto(new InputFile(filePath), {
+                reply_parameters: { message_id: ctx.msg.message_id },
+            });
+        } else if (
+            fileType === ".mp4" || fileType === ".mov" || fileType === ".avi"
+        ) {
+            await ctx.replyWithVideo(new InputFile(filePath), {
+                reply_parameters: { message_id: ctx.msg.message_id },
+            });
+        }
     } catch (error) {
         await ctx.reply(
             `错误：${error.message}\n`,
@@ -108,5 +121,3 @@ bot.command("id", async (ctx) => {
         );
     }
 });
-
-

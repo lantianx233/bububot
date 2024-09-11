@@ -32,12 +32,17 @@ export async function getMediaFiles(dir: string): Promise<string[]> {
     return mediaFiles;
 }
 
-export async function getRandomFile(): Promise<string> {
+export async function getRandomFile(): Promise<{ filePath: string, fileType: string }> {
     const mediaFiles = await getMediaFiles(folderPath);
 
     if (mediaFiles.length === 0) {
         throw new Error("文件夹中没有图片或视频文件。");
     }
 
-    return mediaFiles[Math.floor(Math.random() * mediaFiles.length)]; // 返回完整路径
+    const randomFilePath = mediaFiles[Math.floor(Math.random() * mediaFiles.length)];
+
+    // 获取文件扩展名并转换为小写
+    const fileType = extname(randomFilePath).toLowerCase();
+
+    return { filePath: randomFilePath, fileType };
 }
