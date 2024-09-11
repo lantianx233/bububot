@@ -1,21 +1,27 @@
-import {Bot, InputFile} from "https://deno.land/x/grammy@v1.29.0/mod.ts";
-import { autoRetry } from "https://deno.land/x/grammy_auto_retry@v2.0.2/mod.ts";
-import { getRandomFile } from './getCapoo.ts';
+import { autoRetry, Bot, Context, InputFile } from "./deps.ts";
+import { getRandomFile } from "./getCapoo.ts";
 
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 bot.api.config.use(autoRetry());
 
-//start命令
-    bot.command("start", async (ctx) =>
-        await ctx.reply("放到github上了\n" +
-            "https://github.com/lantianx233/bububot\n" +
-            "欢迎搞破坏🐳\n",
-            {
-                // `reply_parameters` 指定实际的回复哪一条信息。
-                reply_parameters: { message_id: ctx.msg.message_id },
-            }));
+bot.command("start", async (ctx) => {
+    await ctx.reply("🐳", {
+        reply_parameters: { message_id: ctx.msg.message_id },
+    });
+    await ctx.reply(
+        '<a href="https://github.com/lantianx233/bububot">Github页面</a>',
+        {
+            reply_parameters: { message_id: ctx.msg.message_id },
+            parse_mode: "HTML",
+        },
+    );
+});
 
-//随机获取Capoo图片
+/**
+ * /capoo
+ * 通过 getRandomFile()获取文件名
+ * 发送对应图片
+ */
 bot.command("capoo", async (ctx) => {
     try {
         const randomFilePath = await getRandomFile();
@@ -24,24 +30,81 @@ bot.command("capoo", async (ctx) => {
             reply_parameters: { message_id: ctx.msg.message_id },
         });
     } catch (error) {
-        // console.error('获取随机文件时出错:', error);
-        await ctx.reply(`咖波死了呜呜呜呜\n
+        await ctx.reply(
+            `咖波死了呜呜呜呜\n
         死因：${error.message}\n`,
             {
-            reply_parameters: { message_id: ctx.msg.message_id },
-        });
+                reply_parameters: { message_id: ctx.msg.message_id },
+            },
+        );
     }
 });
 
+/**
+ *  通过/push 将信息、图片、文件发送给某个用户或群组（频道）
+ *  先获取用户发送的内容
+ *  然后发送给另一个用户
+ */
+bot.command("push", async (ctx: Context) => {
+    const args = ctx.message?.text?.split(" ").slice(1);
+    if (!args || args.length < 1) {
+        await ctx.reply("请提供目标 chat_id。");
+        return;
+    }
 
-//捕捉错误信息 防止报错退出
-bot.catch((err) => {
-    console.error('Error occurred:', err);
-    err.ctx.reply(`An error occurred: ${err.message}`).then(() => {
-        // 这里可以继续处理回复成功后的逻辑
-        console.log('Error message sent successfully.');
-    }).catch(err => {
-        // 处理发送消息时可能发生的错误
-        console.error('Failed to send error message:', err);
-    });
+    const [targetChatId] = args;
+
+    // 检查消息是否包含文件、图片或文本
+    if (ctx.message?.reply_to_message) {
+        const replyMessage = ctx.message.reply_to_message ?? "";
+
+        try {
+            if (replyMessage.text) {
+                // 发送文本消息
+                await bot.api.sendMessage(targetChatId, replyMessage.text);
+            } else if (replyMessage.photo) {
+                // 发送图片
+                const photoFileId =
+                    replyMessage.photo[replyMessage.photo.length - 1].file_id;
+                await bot.api.sendPhoto(targetChatId, photoFileId);
+            } else if (replyMessage.document) {
+                // 发送文件
+                const documentFileId = replyMessage.document.file_id;
+                await bot.api.sendDocument(targetChatId, documentFileId);
+            } else {
+                await ctx.reply("无法处理此类型的消息。");
+                return;
+            }
+            await ctx.reply("信息已成功推送！");
+        } catch (error) {
+            console.error(error);
+            await ctx.reply("推送失败，请检查输入信息。");
+        }
+    } else {
+        await ctx.reply("请回复要推送的消息或文件。");
+    }
+});
+/**
+ * 获取当前聊天id
+ */
+bot.command("id", async (ctx: Context) => {
+    const chatId = ctx.chat?.id;
+    if (chatId) {
+        await ctx.reply(`当前聊天的 chat_id 是: ${chatId}`);
+    } else {
+        await ctx.reply("无法获取 chat_id。");
+    }
+});
+
+/**
+ * 乱写catch为了不报错退出
+ */
+bot.catch(async (err) => {
+    const ctx = err.ctx;
+    await ctx.reply(
+        `${ctx.message}`,
+        {
+            reply_parameters: { message_id: ctx.msg?.message_id as number },
+        },
+    );
 });

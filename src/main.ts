@@ -1,4 +1,4 @@
-import { webhookCallback } from "https://deno.land/x/grammy@v1.29.0/mod.ts";
+import { webhookCallback } from "./deps.ts";
 // 你可以将其修改为正确的方式来导入你的 `Bot` 对象。
 import {bot} from "./bot.ts";
 

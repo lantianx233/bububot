@@ -1,5 +1,5 @@
 // 导入 Deno 内置的路径模块
-import { join, extname } from 'https://deno.land/std@0.181.0/path/mod.ts';
+import { join, extname } from './deps.ts';
 
 // 定义允许的文件扩展名
 const allowedExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.mp4', '.mov', '.avi'];
