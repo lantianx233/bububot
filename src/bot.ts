@@ -1,4 +1,5 @@
-import { autoRetry, Bot, Context, getRandomFile, InputFile } from "./deps.ts";
+import {autoRetry, Bot, Context, getRandomFile, InputFile} from "./deps.ts";
+
 export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
 bot.api.config.use(autoRetry());
@@ -7,13 +8,14 @@ bot.api.config.use(autoRetry());
  * 乱写catch为了不报错退出
  */
 bot.catch(async (err) => {
-    const ctx = err.ctx;
-    await ctx.reply(
-        `${err.message}`,
-        {
-            reply_parameters: { message_id: ctx.msg?.message_id as number },
-        },
-    );
+    await bot.api.sendMessage(7248116024, `抓到一只虫：${err.message}`);
+});
+
+/**
+ * 复读
+ */
+bot.on("message", async (ctx) => {
+    await ctx.reply(`${ctx.msg.text}`)
 });
 
 bot.command("start", async (ctx) => {
@@ -33,6 +35,8 @@ bot.command("start", async (ctx) => {
  * /capoo
  * 通过 getRandomFile()随机获取文件名
  * 发送对应图片
+ *
+ * 更新了文件类型检测
  */
 bot.command("capoo", async (ctx) => {
     try {
@@ -53,6 +57,10 @@ bot.command("capoo", async (ctx) => {
         ) {
             await ctx.replyWithVideo(new InputFile(filePath), {
                 reply_parameters: { message_id: ctx.msg.message_id },
+            });
+        } else {
+            await ctx.reply("咖波抓到了未知的东西！\n", {
+                reply_parameters: {message_id: ctx.msg.message_id},
             });
         }
     } catch (error) {
