@@ -3,6 +3,20 @@ export const bot = new Bot(Deno.env.get("BOT_TOKEN") || "");
 
 bot.api.config.use(autoRetry());
 
+/**
+ * 乱写catch为了不报错退出
+ */
+bot.catch(async (err) => {
+    const ctx = err.ctx;
+    await ctx.reply(
+        `${err.message}`,
+        {
+            reply_parameters: { message_id: ctx.msg?.message_id as number },
+        },
+    );
+});
+
+
 bot.command("start", async (ctx) => {
     await ctx.reply("🐳", {
         reply_parameters: { message_id: ctx.msg.message_id },
@@ -95,15 +109,4 @@ bot.command("id", async (ctx) => {
     }
 });
 
-/**
- * 乱写catch为了不报错退出
- */
-bot.catch(async (err) => {
-    const ctx = err.ctx;
-    await ctx.reply(
-        `${err.message}`,
-        {
-            reply_parameters: { message_id: ctx.msg?.message_id as number },
-        },
-    );
-});
+
