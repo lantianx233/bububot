@@ -39,14 +39,16 @@ bot.command("capoo", async (ctx) => {
 });
 
 /**
- *  通过/push 将信息、图片、文件发送给某个用户或群组（频道）
+ *  通过/pushto 将信息、图片、文件发送给某个用户或群组（频道）
  *  回复某个要发送的信息
- *  输入 /push [chatId] 以发送
+ *  输入 /pushto [chatId] 以发送
  */
-bot.command("push", async (ctx: Context) => {
+bot.command("pushto", async (ctx: Context) => {
     const args = ctx.message?.text?.split(" ").slice(1);
     if (!args || args.length < 1) {
-        await ctx.reply("请提供目标 chat_id，例如 /push [id]");
+        await ctx.reply("请提供目标 chat_id，例如 /pushto [id]", {
+            reply_to_message_id: ctx.message?.message_id as number,
+        });
         return;
     }
 
@@ -54,38 +56,26 @@ bot.command("push", async (ctx: Context) => {
     const replyMessage = ctx.message?.reply_to_message;
 
     if (!replyMessage) {
-        await ctx.reply("请回复要推送的消息或文件。");
+        await ctx.reply("请回复要推送的消息或文件。", {
+            reply_to_message_id: ctx.message?.message_id as number,
+        });
         return;
     }
 
     try {
-        if (replyMessage.text) {
-            // 发送文本消息
-            await bot.api.sendMessage(targetChatId, replyMessage.text);
-        } else if (replyMessage.photo) {
-            // 发送图片
-            const photoFileId =
-                replyMessage.photo[replyMessage.photo.length - 1].file_id;
-            await bot.api.sendPhoto(targetChatId, photoFileId);
-        } else if (replyMessage.document) {
-            // 发送文件
-            const documentFileId = replyMessage.document.file_id;
-            await bot.api.sendDocument(targetChatId, documentFileId);
-        } else {
-            await ctx.reply("回复的消息类型无法处理。");
-            return;
-        }
+        await bot.api.forwardMessage(
+            targetChatId,
+            replyMessage.chat.id,
+            replyMessage.message_id,
+        );
 
         await ctx.reply("信息已成功推送！", {
-            reply_parameters: { message_id: ctx.msg?.message_id as number },
+            reply_to_message_id: ctx.message?.message_id as number,
         });
     } catch (error) {
-        await ctx.reply(
-            `错误：${error.message}\n`,
-            {
-                reply_parameters: { message_id: ctx.msg?.message_id as number },
-            },
-        );
+        await ctx.reply(`错误：${error.message}`, {
+            reply_to_message_id: ctx.message?.message_id as number,
+        });
     }
 });
 
