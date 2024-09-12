@@ -37,7 +37,7 @@ bot.command("send", async (ctx: Context) => {
     const [targetChatId, message] = args;
     try {
         await bot.api.sendMessage(targetChatId, message);
-        await ctx.reply("信息已成功推送！", {
+        await ctx.reply("信息已成功发送！", {
             reply_to_message_id: ctx.message?.message_id as number,
         });
     } catch (error) {
@@ -76,27 +76,31 @@ bot.command("start", async (ctx) => {
 bot.command("capoo", async (ctx) => {
     try {
         const { filePath, fileType } = await getRandomFile();
-
-        if (fileType === ".gif") {
-            await ctx.replyWithAnimation(new InputFile(filePath), {
-                reply_parameters: { message_id: ctx.msg.message_id },
-            });
-        } else if (
-            fileType === ".jpg" || fileType === ".jpeg" || fileType === ".png"
-        ) {
-            await ctx.replyWithPhoto(new InputFile(filePath), {
-                reply_parameters: { message_id: ctx.msg.message_id },
-            });
-        } else if (
-            fileType === ".mp4" || fileType === ".mov" || fileType === ".avi"
-        ) {
-            await ctx.replyWithVideo(new InputFile(filePath), {
-                reply_parameters: { message_id: ctx.msg.message_id },
-            });
-        } else {
-            await ctx.reply("咖波抓到了未知的东西！\n", {
-                reply_parameters: {message_id: ctx.msg.message_id},
-            });
+        switch (fileType) {
+            case ".gif":
+                await ctx.replyWithAnimation(new InputFile(filePath), {
+                    reply_parameters: {message_id: ctx.msg.message_id},
+                });
+                break;
+            case ".jpeg":
+            case ".jpg":
+            case ".png":
+                await ctx.replyWithPhoto(new InputFile(filePath), {
+                    reply_parameters: {message_id: ctx.msg.message_id},
+                });
+                break;
+            case ".mp4":
+            case ".mov":
+            case ".avi":
+                await ctx.replyWithVideo(new InputFile(filePath), {
+                    reply_parameters: {message_id: ctx.msg.message_id},
+                });
+                break;
+            default:
+                await ctx.reply("咖波抓到了未知的东西！\n", {
+                    reply_parameters: {message_id: ctx.msg.message_id},
+                });
+                break;
         }
     } catch (error) {
         await ctx.reply(
