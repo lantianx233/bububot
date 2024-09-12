@@ -8,15 +8,18 @@ bot.api.config.use(autoRetry());
  * 乱写catch为了不报错退出
  */
 bot.catch(async (err) => {
-    await bot.api.sendMessage(7248116024, `抓到一只虫：${err.message}\n在：${err.ctx.message}`);
+    await bot.api.sendMessage(
+        7248116024,
+        `抓到一只虫：${err.message}\n在：${err.ctx.message}`,
+    );
 });
 
 /**
  * 私聊复读文本
  */
-bot.on("message:text", async (ctx) => {
-    if (ctx.chat.type === "private") {
-        await ctx.reply(`${ctx.msg.text}`)
+bot.chatType("private").on("message:text", async (ctx) => {
+    if (!ctx.msg.text.startsWith("/")) {
+        await ctx.reply(`${ctx.msg.text}`);
     }
 });
 
@@ -24,9 +27,11 @@ bot.on("message:text", async (ctx) => {
  * /send [chatid] "内容" 让bot发送信息
  */
 bot.command("send", async (ctx: Context) => {
-    const args = ctx.message?.text?.split(' ').slice(1);
+    const args = ctx.message?.text?.split(" ").slice(1);
     if (!args || args.length < 2) {
-        await ctx.reply("请提供目标 chat_id和内容，例如：/send [chatid] 我是小猫\n你可以使用/id获取当前chatid。");
+        await ctx.reply(
+            "请提供目标 chat_id和内容，例如：/send [chatid] 我是小猫\n你可以使用/id获取当前chatid。",
+        );
         return;
     }
     const [targetChatId, message] = args;
@@ -43,7 +48,7 @@ bot.command("send", async (ctx: Context) => {
             },
         );
     }
-})
+});
 
 /**
  * 推销github
@@ -111,9 +116,12 @@ bot.command("capoo", async (ctx) => {
 bot.command("pushto", async (ctx: Context) => {
     const args = ctx.message?.text?.split(" ").slice(1);
     if (!args || args.length < 1) {
-        await ctx.reply("请提供目标 chatid，例如 /pushto [chatid]\n你可以使用/id获取当前chatid。", {
-            reply_to_message_id: ctx.message?.message_id as number,
-        });
+        await ctx.reply(
+            "请提供目标 chatid，例如 /pushto [chatid]\n你可以使用/id获取当前chatid。",
+            {
+                reply_to_message_id: ctx.message?.message_id as number,
+            },
+        );
         return;
     }
 
