@@ -14,8 +14,8 @@ bot.catch(async (err) => {
 /**
  * 私聊复读文本
  */
-bot.on("message:text", async (ctx) => {
-    if (ctx.chat.type === "private") {
+bot.chatType("private").on("message:text", async (ctx) => {
+    if (!ctx.msg.text.startsWith("/")) {
         await ctx.reply(`${ctx.msg.text}`)
     }
 });
