@@ -17,10 +17,10 @@ bot.catch(async (err) => {
 /**
  * 私聊复读文本
  */
-bot.chatType("private").on("message:text", async (ctx) => {
-    if (!ctx.msg.text.startsWith("/")) {
-        await ctx.reply(`${ctx.msg.text}`);
-    }
+bot.chatType("private").filter((ctx) => !ctx.msg?.text?.startsWith("/")).on("message:text", async (ctx: Context) => {
+
+    await ctx.reply(`${ctx.msg?.text}`);
+
 });
 
 /**
