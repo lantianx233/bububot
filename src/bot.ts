@@ -157,7 +157,10 @@ bot.command("pushto", async (ctx: Context) => {
  */
 bot.command("id", async (ctx) => {
     try {
-        await ctx.reply(ctx.chat.id.toString());
+        await ctx.reply(ctx.chat.id.toString(),
+            {
+                reply_parameters: {message_id: ctx.msg.message_id},
+            },);
     } catch (error) {
         await ctx.reply(
             `错误：${error.message}\n`,
