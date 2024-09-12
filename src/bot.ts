@@ -15,6 +15,17 @@ bot.catch(async (err) => {
 });
 
 /**
+ * 设置指令列表
+ */
+bot.api.setMyCommands([
+    {command: "start", description: "start"},
+    {command: "capoo", description: "随机获取咖波"},
+    {command: "id", description: "获取当前会话id"},
+    {command: "send", description: "发送/send [chatid] \"内容\" 让bot帮你说话"},
+    {command: "pushto", description: "回复某个消息发送/pushto [chatid] 转发到指定对话中（需要读取消息权限）"},
+])
+
+/**
  * 私聊复读文本
  */
 bot.chatType("private").filter((ctx) => !ctx.msg?.text?.startsWith("/")).on("message:text", async (ctx: Context) => {
